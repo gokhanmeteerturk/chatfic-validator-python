@@ -1,0 +1,61 @@
+{
+    "format": "chatficbasic",
+    "version": "1",
+    "chatFic": {
+        "globalidentifier": "547e8id1hb6",
+        "serverslug": "afterdark",
+        "title": "My Hometown Episode 1",
+        "description": "Example Desc.",
+        "author": "mySelf",
+        "handles": {
+            "patreon": "examplepatreon",
+            "kofi": "exkofi"
+        },
+        "variables": {},
+        "modified": 1713803078985,
+        "episode": 1,
+        "characters": {
+            "player": {
+                "name": "Bob"
+            },
+            "app": {
+                "name": "app"
+            },
+            "eve": {
+                "name": "Eve",
+                "color": "black"
+            }
+        }
+    },
+    "bubble": [
+        {
+            "messageindex": 1,
+            "message": "hey, do you know the time?",
+            "from": "player",
+            "side": 2,
+            "chatroom": "Eve"
+        },
+        {
+            "messageindex": 2,
+            "message": "Yes I do!",
+            "from": "eve",
+            "side": 0,
+            "chatroom": "Eve"
+        },
+        {
+            "messageindex": 3,
+            "message": "",
+            "from": "eve",
+            "side": 0,
+            "chatroom": "Eve",
+            "multimedia": "time.jpeg"
+        },
+        {
+            "messageindex": 4,
+            "message": "thanks!",
+            "from": "player",
+            "side": 2,
+            "chatroom": "Eve"
+        }
+    ]
+}

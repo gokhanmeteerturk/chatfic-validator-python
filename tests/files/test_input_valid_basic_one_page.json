@@ -1,0 +1,62 @@
+{
+    "title": "My Hometown Episode 1",
+    "description": "Example Desc.",
+    "author": "mySelf",
+    "handles": {
+      "patreon": "examplepatreon",
+      "kofi": "exkofi"
+    },
+    "variables": {},
+    "modified": 1713803078985,
+    "episode": 1,
+    "characters": {
+      "player": {
+        "name": "Bob"
+      },
+      "app": {
+        "name": "app"
+      },
+      "eve": {
+        "name": "Eve",
+        "color": "black"
+      }
+    },
+    "format": "chatficbasicjson",
+    "pages": [
+      {
+        "id": 1,
+        "name": "initial",
+        "messages": [
+          {
+            "message": "hey, do you know the time?",
+            "from": "player",
+            "side": 2,
+            "multimedia": null,
+            "chatroom": "Eve"
+          },
+          {
+            "message": "Yes I do!",
+            "from": "eve",
+            "side": 0,
+            "multimedia": null,
+            "chatroom": "Eve"
+          },
+          {
+            "message": "",
+            "from": "eve",
+            "side": "0",
+            "multimedia": "media/time.jpeg",
+            "chatroom": "Eve"
+          },
+          {
+            "message": "thanks!",
+            "from": "player",
+            "side": 2,
+            "multimedia": null,
+            "chatroom": "Eve"
+          }
+        ],
+        "options": []
+      }
+    ]
+  }

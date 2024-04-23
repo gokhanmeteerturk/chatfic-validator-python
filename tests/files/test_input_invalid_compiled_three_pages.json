@@ -1,0 +1,114 @@
+{
+  "format": "chatficbasic",
+  "version": "1",
+  "chatFic": {
+      "globalidentifier": "e5288id1h1j",
+      "serverslug": "afterdark",
+      "title": "My Hometown Episode 1",
+      "description": "Example Desc.",
+      "author": "mySelf",
+      "handles": {
+          "patreon": "examplepatreon",
+          "kofi": "exkofi"
+      },
+      "variables": {},
+      "modified": 1713803078985,
+      "episode": 1,
+      "characters": {
+          "player": {
+              "name": "Bob"
+          },
+          "app": {
+              "name": "app"
+          },
+          "eve": {
+              "name": "Eve",
+              "color": "black"
+          }
+      }
+  },
+  "bubble": [
+      {
+          "messageindex": 1,
+          "message": "hey, do you know the time?",
+          "from": "player",
+          "side": 2,
+          "chatroom": "Eve"
+      },
+      {
+          "messageindex": 2,
+          "message": "Yes I do!",
+          "from": "eve",
+          "side": 0,
+          "chatroom": "Eve"
+      },
+      {
+          "messageindex": 3,
+          "message": "",
+          "from": "eve",
+          "side": 0,
+          "chatroom": "Eve",
+          "multimedia": "time.jpeg"
+      },
+      {
+          "messageindex": 4,
+          "message": "thanks!",
+          "options": [
+              {
+                  "to": 5
+              }
+          ],
+          "from": "player",
+          "side": 2,
+          "chatroom": "Eve"
+      },
+      {
+          "messageindex": 5,
+          "message": "is this page two?",
+          "from": "player",
+          "side": 2,
+          "chatroom": "Eve"
+      },
+      {
+          "messageindex": 6,
+          "message": "Yes!",
+          "from": "eve",
+          "side": 0,
+          "chatroom": "Eve"
+      },
+      {
+          "messageindex": 7,
+          "message": null,
+          "options": [
+              {
+                  "text": "op3",
+                  "to": 8
+              },
+              {
+                  "text": "op11",
+                  "to": 11
+              },
+              {
+                  "text": "op0"
+              }
+          ],
+          "from": null,
+          "side": 1,
+          "chatroom": "Eve"
+      },
+      {
+          "messageindex": 8,
+          "message": "is this page two?",
+          "from": "player",
+          "side": 2,
+          "chatroom": "Eve"
+      },
+      {
+          "messageindex": 9,
+          "message": "Yes!",
+          "from": "eve",
+          "side": 0,
+          "chatroom": "Eve"
+      }
+  ]
+}
