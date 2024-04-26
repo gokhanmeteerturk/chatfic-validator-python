@@ -1,0 +1,2 @@
+## 0.1.1 - 2024-04-26
+    -   #1 Fixed wrong "color" key in list.remove

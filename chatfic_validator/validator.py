@@ -140,7 +140,7 @@ class BaseChatficValidator:
             if "color" in character_keys:
                 character_keys.remove("color")
             if "model" in character_keys:
-                character_keys.remove("color")
+                character_keys.remove("model")
             if character_keys:
                 errors.append(ChatficValidationError(
                     f"Alien fields in character "
