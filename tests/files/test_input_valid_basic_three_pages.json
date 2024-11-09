@@ -18,7 +18,18 @@
       },
       "eve": {
         "name": "Eve",
-        "color": "black"
+        "gender": "female",
+        "skin": "white",
+        "eyes": {
+          "color": "blue"
+        },
+        "dress": {
+          "size": "medium"
+        },
+        "hair": {
+          "color": "blonde",
+          "style": "straight"
+        }
       }
     },
     "format": "chatficbasicjson",

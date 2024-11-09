@@ -11,6 +11,7 @@ class ChatficFormat(Enum):
 
 
 class ChatficValidator:
+    __slots__ = []
     @staticmethod
     def validate(data: Union[str, dict],
                  chatfic_format: ChatficFormat,
@@ -116,6 +117,7 @@ class ChatficValidator:
 
 
 class BaseChatficValidator:
+    __slots__ = []
     @staticmethod
     def checkConsecutive(lst: list) -> bool:
         return sorted(lst) == list(range(min(lst), max(lst) + 1))
@@ -138,13 +140,16 @@ class BaseChatficValidator:
             else:
                 character_keys.remove("name")
             if "color" in character_keys:
+                warnings.append("'color' attribute as a direct child of "
+                                "character property is not recommended "
+                                "as of chatfic-format v1.0.0")
                 character_keys.remove("color")
             if "model" in character_keys:
                 character_keys.remove("model")
             if character_keys:
-                errors.append(ChatficValidationError(
-                    f"Alien fields in character "
-                    f"'{character}': {character_keys}"))
+                warnings.append(
+                    f"Make sure these fields in character are expected "
+                    f"'{character}': {character_keys}")
         if "player" not in characters:
             errors.append(
                 ChatficValidationError(
@@ -656,6 +661,8 @@ class CompiledChatficValidator(BaseChatficValidator):
                 warnings.append(
                     f"Unused multimedia: "
                     f"{sorted(unused_multimedia)}")
+                for unused_multimedia_single in sorted(unused_multimedia):
+                    warnings.append("Multimedia not used: " + unused_multimedia_single)
 
             #   - Bad Multimedia (error)
             if bad_multimedia:
