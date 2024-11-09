@@ -1,2 +1,7 @@
+## 0.2.1 - 2024-04-26
+    -   #1 Added support for character properties (eye color, hair style etc)
+    -   #2 Alien character field is not an error anymore. Causes a warning.
+    -   #3 Fixed missing "Multimedia not used" warnings from Compiled story.
+
 ## 0.1.1 - 2024-04-26
     -   #1 Fixed wrong "color" key in list.remove

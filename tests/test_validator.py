@@ -14,7 +14,9 @@ def test_input_valid_basic_one_page():
 
     assert result.is_valid is True
     assert len(result.errors) == 0
-    assert len(result.warnings) == 0
+    assert result.warnings == ["Make sure these fields in character are "
+                               "expected 'eve': ['gender', 'skin', 'eyes', "
+                               "'dress', 'hair']"]
 
 
 def test_input_valid_compiled_one_page():
@@ -30,7 +32,9 @@ def test_input_valid_compiled_one_page():
 
     assert result.is_valid is True
     assert len(result.errors) == 0
-    assert len(result.warnings) == 0
+    assert result.warnings == ["Make sure these fields in character are "
+                               "expected 'eve': ['gender', 'skin', 'eyes', "
+                               "'dress', 'hair']"]
 
 
 def test_input_invalid_basic_one_page():
@@ -58,8 +62,12 @@ def test_input_invalid_basic_one_page():
 
     assert sorted(error_messages) == sorted(expected_errors)
     assert result.is_valid is False
-    assert len(result.warnings) == 1
-    assert result.warnings == ["Multimedia not used: unknown.jpg"]
+    assert len(result.warnings) == 2
+    assert sorted(result.warnings) == sorted(["Multimedia not used: unknown.jpg",
+                                              "Make sure these fields in "
+                                              "character are expected 'eve': "
+                                              "['gender', 'skin', 'eyes', "
+                                              "'dress', 'hair']"])
 
 
 def test_input_invalid_compiled_one_page():
@@ -83,14 +91,17 @@ def test_input_invalid_compiled_one_page():
     expected_warnings = ["Unknown fields found in 'chatFic': ['idk']",
                          'Unreachable message indexes: [5]',
                          "Unused characters: ['adam']",
-                         "Unused multimedia: ['unknown.jpg']"]
+                         "Unused multimedia: ['unknown.jpg']",
+                         "Multimedia not used: unknown.jpg",
+                         "Make sure these fields in character are expected "
+                         "'eve': ['gender', 'skin', 'eyes', 'dress', 'hair']"]
 
     error_messages = [str(error) for error in result.errors]
 
     assert sorted(error_messages) == sorted(expected_errors)
     assert sorted(result.warnings) == sorted(expected_warnings)
     assert result.is_valid is False
-    assert len(result.warnings) == 4
+    assert len(result.warnings) == 6
 
 
 def test_input_valid_basic_three_pages():
@@ -106,7 +117,9 @@ def test_input_valid_basic_three_pages():
 
     assert result.is_valid is True
     assert len(result.errors) == 0
-    assert len(result.warnings) == 0
+    assert result.warnings == ["Make sure these fields in character are "
+                               "expected 'eve': ['gender', 'skin', 'eyes', "
+                               "'dress', 'hair']"]
 
 
 def test_input_valid_compiled_three_pages():
@@ -123,7 +136,9 @@ def test_input_valid_compiled_three_pages():
 
     assert result.is_valid is True
     assert len(result.errors) == 0
-    assert len(result.warnings) == 0
+    assert result.warnings == ["Make sure these fields in character are "
+                               "expected 'eve': ['gender', 'skin', 'eyes', "
+                               "'dress', 'hair']"]
 
 
 def test_input_invalid_basic_three_pages():
@@ -143,11 +158,19 @@ def test_input_invalid_basic_three_pages():
                        " to an unknown page id: 5"]
 
     expected_warnings = ["There is an option 'message' that will be ignored,"
-                         " because there is only 1 option in that page."]
+                         " because there is only 1 option in that page.",
+                                              "Make sure these fields in "
+                                              "character are expected 'eve': "
+                                              "['gender', 'skin', 'eyes', "
+                                              "'dress', 'hair']"]
 
     error_messages = [str(error) for error in result.errors]
 
     assert sorted(error_messages) == sorted(expected_errors)
+    print(sorted("result.warnings"))
+    print(sorted(result.warnings))
+    print(sorted("expected_warnings"))
+    print(sorted(expected_warnings))
     assert sorted(result.warnings) == sorted(expected_warnings)
     assert result.is_valid is False
 
@@ -171,7 +194,9 @@ def test_input_invalid_compiled_three_pages():
     error_messages = [str(error) for error in result.errors]
 
     assert sorted(error_messages) == sorted(expected_errors)
-    assert len(result.warnings) == 0
+    assert result.warnings == ["Make sure these fields in character are "
+                               "expected 'eve': ['gender', 'skin', 'eyes', "
+                               "'dress', 'hair']"]
     assert result.is_valid is False
 
 
