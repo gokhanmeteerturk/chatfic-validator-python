@@ -17,7 +17,7 @@ pip install chatfic-validator
 Here's an example of how to use the Chatfic Validator:
 
 ```python
-from chatfic_validator import ChatficValidator as validator
+from chatfic_validator import ChatficValidator as validator, ChatficFormat
 
 # Load the chatfic data from a file
 with open('storybasic.json', 'r', encoding="utf-8") as file:
