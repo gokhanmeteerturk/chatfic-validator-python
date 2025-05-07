@@ -1,5 +1,5 @@
 import json
-from typing import Union
+from typing import Union, List
 from enum import Enum
 from .result import ChatficValidationResult
 from .error import ChatficValidationError
@@ -10,8 +10,16 @@ class ChatficFormat(Enum):
     BASIC_JSON = 'chatficbasicjson'
 
 
+class ChatficVersion(Enum):
+    V0_9 = "0.9"
+    V1 = "1"
+    V1_1 = "1.1"
+
+SUPPORTED_VERSIONS: List[str] = [v.value for v in ChatficVersion]
+DEFAULT_VERSION: str = ChatficVersion.V1_1.value
+
+
 class ChatficValidator:
-    __slots__ = []
     @staticmethod
     def validate(data: Union[str, dict],
                  chatfic_format: ChatficFormat,
@@ -117,7 +125,6 @@ class ChatficValidator:
 
 
 class BaseChatficValidator:
-    __slots__ = []
     @staticmethod
     def checkConsecutive(lst: list) -> bool:
         return sorted(lst) == list(range(min(lst), max(lst) + 1))
@@ -196,7 +203,22 @@ class BaseChatficValidator:
 class BasicChatficValidator(BaseChatficValidator):
     @staticmethod
     def validate(data: dict, multimedia_list: list) -> ChatficValidationResult:
+        errors = []
+        warnings = []
+
         # 1. Check Required Fields, and detect unnecessary fields:
+        version = DEFAULT_VERSION
+        if "version" in data:
+            if data["version"] not in SUPPORTED_VERSIONS:
+                errors.append(ChatficValidationError(
+                    f"Unsupported version: {data['version']}. Supported "
+                    f"versions are: {SUPPORTED_VERSIONS}"))
+            version = data["version"]
+        else:
+            warnings.append(
+                f"Using default version: {version}. "
+                f"Specifying a version is highly recommended.")
+
         required_fields = {
             "title": {"type": "str"},
             "description": {"type": "str"},
@@ -208,8 +230,6 @@ class BasicChatficValidator(BaseChatficValidator):
             "handles": {"type": "dict"},
             "variables": {"type": "dict"},
         }
-        errors = []
-        warnings = []
 
         for field, field_info in required_fields.items():
             if field not in data:
@@ -234,6 +254,43 @@ class BasicChatficValidator(BaseChatficValidator):
                                     f"'value'")
                                 )
 
+        unused_multimedia = set(multimedia_list)
+        bad_multimedia = []
+        valid_apps = []
+        if version == ChatficVersion.V1_1.value:
+            if "apps" in data:
+                if not isinstance(data["apps"], dict):
+                    errors.append(ChatficValidationError(
+                        f"'apps' should be an object with key-value pairs,"
+                        f" not a '{type(data['apps'])}'"))
+                else:
+                    for app_key, app_value in data["apps"].items():
+                        valid_apps.append(app_key)
+                        if not isinstance(app_value, dict):
+                            errors.append(ChatficValidationError(
+                                f"The app '{app_key}' should be an object with"
+                                f" key-value pairs, not a '{type(app_value)}'"))
+                        else:
+                            if "name" in app_value and not isinstance(app_value["name"],
+                                                                str):
+                                errors.append(ChatficValidationError(
+                                    f"The app '{app_key}' has a name but it is"
+                                    f" not a string"))
+                            if "background" in app_value:
+                                if not isinstance(app_value["background"], str):
+                                    errors.append(ChatficValidationError(
+                                        f"The app '{app_key}' has a background but"
+                                        f" it is not a media link"))
+                                if not app_value["background"].startswith(
+                                        "media/") or app_value[
+                                    "background"][6:] not in multimedia_list:
+                                    bad_multimedia.append(app_value["background"])
+                                else:
+                                    unused_multimedia.discard(
+                                        app_value["background"][6:])
+
+
+
         character_slugs = set()
         if "characters" in data and isinstance(data["characters"], dict):
             # 2. Validate character data:
@@ -255,10 +312,8 @@ class BasicChatficValidator(BaseChatficValidator):
 
         if "pages" in data:
             # 4.2 Page keys check
-            unused_multimedia = set(multimedia_list)
             unknown_character_slugs = []
             missing_required_message_fields = set()
-            bad_multimedia = []
             any_unknown_sides = False
             for page in data["pages"]:
                 if "id" not in page or not isinstance(page["id"], int):
@@ -283,8 +338,46 @@ class BasicChatficValidator(BaseChatficValidator):
                 }
                 for message in page["messages"]:
                     message_keys = message.keys()
+                    if version == ChatficVersion.V1_1.value:
+                        if "app" in message_keys:
+                            message_app = message["app"]
+                            if message_app is not None and message_app != "chat" and message_app != "home":
+                                if not isinstance(message_app, str):
+                                    errors.append(ChatficValidationError(
+                                        f"Message app should be a string"))
+                                else:
+                                    if not message_app in valid_apps:
+                                        errors.append(
+                                            ChatficValidationError(
+                                            f"Message app '{message_app}' is"
+                                            f" unknown. Options: {valid_apps}"
+                                            )
+                                        )
+                        if "notification" in message_keys:
+                            message_notification = message["notification"]
+                            if not isinstance(
+                                    message_notification, str):
+                                errors.append(ChatficValidationError(
+                                    f"Message notification should be a string")
+                                )
+                        if "type" in message_keys:
+                            message_type = message["type"]
+                            if not isinstance(
+                                    message_type, str):
+                                errors.append(ChatficValidationError(
+                                    f"Message type should be a string")
+                                )
+
                     if "side" not in message_keys:
-                        missing_required_message_fields.add("side")
+                        if "type" not in message_keys or message["type"] != "thought" or version != ChatficVersion.V1_1.value:
+                            missing_required_message_fields.add("side")
+                    else:
+                        if message["side"] is None:
+                            if "type" not in message_keys or message["type"] != "thought" or version != ChatficVersion.V1_1.value:
+                                any_unknown_sides = True
+                        elif message["side"] not in [0, 1, 2, "0", "1", "2"]:
+                            any_unknown_sides = True
+
                     for field, field_info in required_message_fields.items():
                         if field not in message_keys:
                             missing_required_message_fields.add(field)
@@ -307,11 +400,6 @@ class BasicChatficValidator(BaseChatficValidator):
                             "from"] not in character_slugs:
                             unknown_character_slugs.append(message["from"])
                         # TODO: CHECK UNUSED CHARACTER SLUGS FOR A WARNING
-                        if field == "side" and "side" in message and message[
-                            "side"] not in [0, 1, 2,
-                                            "0", "1",
-                                            "2"]:
-                            any_unknown_sides = True
                         if field == "multimedia" and "multimedia" in message:
                             if message["multimedia"] is not None:
                                 if not message["multimedia"].startswith(
@@ -423,16 +511,32 @@ class CompiledChatficValidator(BaseChatficValidator):
     def validate(data: dict, multimedia_list: list) -> ChatficValidationResult:
 
         character_slugs = set()
+        errors = []
+        warnings = []
+        valid_apps = []
+        unused_multimedia = set(multimedia_list)
+        bad_multimedia = set()
+
+        # 1. Check Required Fields, and detect unnecessary fields:
+        version = DEFAULT_VERSION
+        if "version" in data:
+            if data["version"] not in SUPPORTED_VERSIONS:
+                errors.append(ChatficValidationError(
+                    f"Unsupported version: {data[version]}. Supported "
+                    f"versions are: {SUPPORTED_VERSIONS}"))
+            version = data["version"]
+        else:
+            errors.append(ChatficValidationError(
+                f"Missing version field. Rest of the validation will be for"
+                f" the default version: {version}."
+            ))
         # 1 Check Required Fields
         # 1.1 Check Required Top Level Fields, and detect unnecessary fields:
         required_fields = {
             "format": {"type": "str"},
-            "version": {"type": "str"},
             "chatFic": {"type": "dict"},
             "bubble": {"type": "list"},
         }
-        errors = []
-        warnings = []
 
         for field, field_info in required_fields.items():
             if field not in data:
@@ -445,6 +549,7 @@ class CompiledChatficValidator(BaseChatficValidator):
                         f"Field '{field}' must be a {field_info['type']}"))
 
         unknown_fields = set(data.keys()) - set(required_fields.keys())
+        unknown_fields.discard("version")
         if unknown_fields:
             warnings.append(
                 f"Unknown fields found: {sorted(unknown_fields)}")
@@ -460,8 +565,10 @@ class CompiledChatficValidator(BaseChatficValidator):
                 "handles": {"type": "dict"},
                 "variables": {"type": "dict"},
                 "episode": {"type": "int"},
-                "characters": {"type": "dict"},
+                "characters": {"type": "dict"}
             }
+            if version == ChatficVersion.V1_1.value:
+                required_chatfic_fields["apps"] = {"type": "dict"}
 
             for field, field_info in required_chatfic_fields.items():
                 if field not in data["chatFic"]:
@@ -487,10 +594,39 @@ class CompiledChatficValidator(BaseChatficValidator):
                                         f"Variable '{variable}' must have a "
                                         f"'value'")
                                     )
+                        if field == "apps" and version == ChatficVersion.V1_1.value:
+                            for app_key, app_value in data["chatFic"]["apps"].items():
+                                valid_apps.append(app_key)
+                                if not isinstance(app_value, dict):
+                                    errors.append(ChatficValidationError(
+                                        f"App '{app_key}' must be a dict")
+                                    )
+                                else:
+                                    if "name" in app_value and not isinstance(
+                                            app_value["name"], str):
+                                        errors.append(ChatficValidationError(
+                                            f"Name for '{app_key}' must be a"
+                                            f" string")
+                                        )
+                                    if "background" in app_value:
+                                        if not isinstance(
+                                            app_value["background"], str):
+                                            errors.append(ChatficValidationError(
+                                                f"Background for '{app_key}' exists"
+                                                f" but it is not a string")
+                                            )
+                                        else:
+                                            if app_value["background"] not in multimedia_list:
+                                                bad_multimedia.add(
+                                                    app_value["background"])
+                                            else:
+                                                unused_multimedia.discard(
+                                                    app_value["background"])
 
             unknown_fields = set(data["chatFic"].keys()) - set(
                 required_chatfic_fields.keys())
             unknown_fields.discard("modified")
+            unknown_fields.discard("version")
             if unknown_fields:
                 warnings.append(
                     f"Unknown fields found in"
@@ -517,8 +653,6 @@ class CompiledChatficValidator(BaseChatficValidator):
         unknown_message_sides = set()
         unknown_message_characters = set()
         used_characters = set()
-        unused_multimedia = set(multimedia_list)
-        bad_multimedia = set()
         notnull_single_option_text = set()
         null_multiple_option_texts = False
 
@@ -534,10 +668,17 @@ class CompiledChatficValidator(BaseChatficValidator):
                 #   - Fields
                 for field, field_info in required_fields.items():
                     if field not in bubble:
+                        if field == "chatroom" and version == ChatficVersion.V1_1.value:
+                            if "app" in bubble and bubble["app"] != "chat" and bubble["app"] is not None:
+                                # chatroom is not required for non-chat messages for v1.1
+                                continue
                         missing_message_fields.add(field)
                     else:
                         if field_info["type"] != type(bubble[field]).__name__:
-                            if field == "from" and bubble["from"] is None and "options" in bubble and isinstance(bubble["options"], list) and bubble["options"]:
+                            if field == "from" and bubble[
+                                "from"] is None and "options" in bubble and isinstance(
+                                    bubble["options"], list) and bubble[
+                                "options"]:
                                 # from can be null on bubbles with options.
                                 pass
                             else:
@@ -545,8 +686,14 @@ class CompiledChatficValidator(BaseChatficValidator):
 
                 unknown = set(bubble.keys()) - set(required_fields.keys())
                 unknown.discard("options")
+                unknown.discard("sentiment")
                 unknown.discard("multimedia")
                 unknown.discard("message")
+                if version == ChatficVersion.V1_1.value:
+                    unknown.discard("extra")
+                    unknown.discard("notification")
+                    unknown.discard("app")
+                    unknown.discard("type")
                 if unknown:
                     unknown_message_fields.update(unknown)
 
@@ -583,7 +730,27 @@ class CompiledChatficValidator(BaseChatficValidator):
                             bad_multimedia.add(bubble["multimedia"])
                         else:
                             unused_multimedia.discard(bubble["multimedia"])
-
+                if "extra" in bubble and bubble[
+                    "extra"] is not None and version == ChatficVersion.V1_1.value:
+                    if not isinstance(bubble["extra"], dict):
+                        wrong_type_message_fields.add("extra")
+                if "app" in bubble and bubble[
+                    "app"] is not None and version == ChatficVersion.V1_1.value:
+                    if not isinstance(bubble["app"], str):
+                        wrong_type_message_fields.add("app")
+                    elif bubble["app"] not in valid_apps:
+                        errors.append(ChatficValidationError(
+                            f"Unknown app '{bubble['app']}'"))
+                    else:
+                        pass # for now
+                if "type" in bubble and bubble[
+                    "type"] is not None and version == ChatficVersion.V1_1.value:
+                    if not isinstance(bubble["type"], str):
+                        wrong_type_message_fields.add("type")
+                if "sentiment" in bubble and bubble[
+                    "sentiment"] is not None and version in [ChatficVersion.V1_1.value, ChatficVersion.V1]:
+                    if not isinstance(bubble["sentiment"], str):
+                        wrong_type_message_fields.add("sentiment")
                 if "options" in bubble:
                     if not isinstance(bubble["options"], list):
                         wrong_type_message_fields.add("options")
@@ -662,7 +829,8 @@ class CompiledChatficValidator(BaseChatficValidator):
                     f"Unused multimedia: "
                     f"{sorted(unused_multimedia)}")
                 for unused_multimedia_single in sorted(unused_multimedia):
-                    warnings.append("Multimedia not used: " + unused_multimedia_single)
+                    warnings.append(
+                        "Multimedia not used: " + unused_multimedia_single)
 
             #   - Bad Multimedia (error)
             if bad_multimedia:

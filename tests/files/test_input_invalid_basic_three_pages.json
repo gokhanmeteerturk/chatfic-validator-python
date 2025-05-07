@@ -2,6 +2,7 @@
     "title": "My Hometown Episode 1",
     "description": "Example Desc.",
     "author": "mySelf",
+    "version": "1",
     "handles": {
       "patreon": "examplepatreon",
       "kofi": "exkofi"

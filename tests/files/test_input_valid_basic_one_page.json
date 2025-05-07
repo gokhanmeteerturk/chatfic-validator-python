@@ -9,6 +9,7 @@
     "variables": {},
     "modified": 1713803078985,
     "episode": 1,
+    "version": "1.1",
     "characters": {
       "player": {
         "name": "Bob"
@@ -56,6 +57,22 @@
             "message": "",
             "from": "eve",
             "side": "0",
+            "multimedia": "media/time.jpeg",
+            "chatroom": "Eve"
+          },
+          {
+            "message": "",
+            "from": "eve",
+            "side": "0",
+            "multimedia": "media/time.jpeg",
+            "chatroom": "Eve"
+          },
+          {
+            "message": "",
+            "from": "eve",
+            "side": null,
+            "type": "thought",
+            "app": "chat",
             "multimedia": "media/time.jpeg",
             "chatroom": "Eve"
           },

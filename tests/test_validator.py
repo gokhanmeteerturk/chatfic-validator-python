@@ -3,14 +3,17 @@ from chatfic_validator import ChatficValidator, ChatficFormat
 
 def test_input_valid_basic_one_page():
     # Load the valid JSON text from the test file
-    with open('./tests/files/test_input_valid_basic_one_page.json') as file:
+    with open('./tests/files/test_input_valid_basic_one_page.json', encoding='utf-8') as file:
         json_text = file.read()
+
 
     validator = ChatficValidator()
 
     result = validator.validate_json_text(json_text,
                                           ChatficFormat.BASIC_JSON,
                                           ["time.jpeg"])
+
+    print(result.errors)
 
     assert result.is_valid is True
     assert len(result.errors) == 0
@@ -21,14 +24,15 @@ def test_input_valid_basic_one_page():
 
 def test_input_valid_compiled_one_page():
     # Load the valid JSON text from the test file
-    with open('./tests/files/test_input_valid_compiled_one_page.json') as file:
+    with open('./tests/files/test_input_valid_compiled_one_page.json', encoding='utf-8') as file:
         json_text = file.read()
 
     validator = ChatficValidator()
 
     result = validator.validate_json_text(json_text,
                                           ChatficFormat.COMPILED_JSON,
-                                          ["time.jpeg"])
+                                          ["time.jpeg", "school.jpg"])
+
 
     assert result.is_valid is True
     assert len(result.errors) == 0
@@ -38,7 +42,7 @@ def test_input_valid_compiled_one_page():
 
 
 def test_input_invalid_basic_one_page():
-    with open('./tests/files/test_input_invalid_basic_one_page.json') as file:
+    with open('./tests/files/test_input_invalid_basic_one_page.json', encoding='utf-8') as file:
         json_text = file.read()
 
     validator = ChatficValidator()
@@ -55,6 +59,7 @@ def test_input_invalid_basic_one_page():
         "Pages should have an integer 'id' key",
         "Pages should have a string 'name' key",
         "Reference to unknown multimedia: time.jpeg",
+        "There are messages with unknown 'side' values (only 0, 1 and 2 are allowed)",
         "There are messages missing required fields: ['from', 'side']"
     ]
 
@@ -72,7 +77,7 @@ def test_input_invalid_basic_one_page():
 
 def test_input_invalid_compiled_one_page():
     with open(
-            './tests/files/test_input_invalid_compiled_one_page.json') as file:
+            './tests/files/test_input_invalid_compiled_one_page.json', encoding='utf-8') as file:
         json_text = file.read()
 
     validator = ChatficValidator()
@@ -85,6 +90,7 @@ def test_input_invalid_compiled_one_page():
                        'Missing required field: chatFic.author',
                        'Missing required field: chatFic.description',
                        'Missing required field: chatFic.handles',
+                       'Missing required field: chatFic.apps',
                        "Unknown multimedia: ['time.jpeg']",
                        'Unknown sides found: [4]']
 
@@ -106,7 +112,7 @@ def test_input_invalid_compiled_one_page():
 
 def test_input_valid_basic_three_pages():
     # Load the valid JSON text from the test file
-    with open('./tests/files/test_input_valid_basic_three_pages.json') as file:
+    with open('./tests/files/test_input_valid_basic_three_pages.json', encoding='utf-8') as file:
         json_text = file.read()
 
     validator = ChatficValidator()
@@ -125,7 +131,7 @@ def test_input_valid_basic_three_pages():
 def test_input_valid_compiled_three_pages():
     # Load the valid JSON text from the test file
     with open(
-            './tests/files/test_input_valid_compiled_three_pages.json') as file:
+            './tests/files/test_input_valid_compiled_three_pages.json', encoding='utf-8') as file:
         json_text = file.read()
 
     validator = ChatficValidator()
@@ -144,7 +150,7 @@ def test_input_valid_compiled_three_pages():
 def test_input_invalid_basic_three_pages():
     # Load the valid JSON text from the test file
     with open(
-            './tests/files/test_input_invalid_basic_three_pages.json') as file:
+            './tests/files/test_input_invalid_basic_three_pages.json', encoding='utf-8') as file:
         json_text = file.read()
 
     validator = ChatficValidator()
@@ -167,10 +173,6 @@ def test_input_invalid_basic_three_pages():
     error_messages = [str(error) for error in result.errors]
 
     assert sorted(error_messages) == sorted(expected_errors)
-    print(sorted("result.warnings"))
-    print(sorted(result.warnings))
-    print(sorted("expected_warnings"))
-    print(sorted(expected_warnings))
     assert sorted(result.warnings) == sorted(expected_warnings)
     assert result.is_valid is False
 
@@ -178,7 +180,7 @@ def test_input_invalid_basic_three_pages():
 def test_input_invalid_compiled_three_pages():
     # Load the valid JSON text from the test file
     with open(
-            './tests/files/test_input_invalid_compiled_three_pages.json') as file:
+            './tests/files/test_input_invalid_compiled_three_pages.json', encoding='utf-8') as file:
         json_text = file.read()
 
     validator = ChatficValidator()
