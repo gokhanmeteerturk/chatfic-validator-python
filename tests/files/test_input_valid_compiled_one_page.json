@@ -1,6 +1,6 @@
 {
     "format": "chatficbasic",
-    "version": "1",
+    "version": "1.1",
     "chatFic": {
         "globalidentifier": "547e8id1hb6",
         "serverslug": "afterdark",
@@ -14,6 +14,11 @@
         "variables": {},
         "modified": 1713803078985,
         "episode": 1,
+        "apps": {
+          "chat":   { "name": "Messages" },
+          "photofeed":{ "name": "InstaPic" },
+          "school": { "name": "School", "background": "school.jpg" }
+        },
         "characters": {
             "player": {
                 "name": "Bob"
@@ -43,7 +48,8 @@
             "messageindex": 1,
             "message": "hey, do you know the time?",
             "from": "player",
-            "side": 2,
+            "type": "thought",
+            "side": 1,
             "chatroom": "Eve"
         },
         {
@@ -51,7 +57,15 @@
             "message": "Yes I do!",
             "from": "eve",
             "side": 0,
-            "chatroom": "Eve"
+            "app": "photofeed",
+            "notification": "📸 Alice posted a new photo on Instapic!",
+            "extra": {
+                "likes": 15,
+                "comments": [
+                    {"bob": "Nice!"},
+                    {"mike": "I like it."}
+                ]
+            }
         },
         {
             "messageindex": 3,
@@ -59,6 +73,7 @@
             "from": "eve",
             "side": 0,
             "chatroom": "Eve",
+            "app": "chat",
             "multimedia": "time.jpeg"
         },
         {

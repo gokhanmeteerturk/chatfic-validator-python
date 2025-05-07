@@ -1,4 +1,10 @@
-## 0.2.1 - 2024-04-26
+## 0.2.3 - 2025-05-07
+    -   #1 Fixed unsupported quotes in f-strings for older python versions.
+
+## 0.2.2 - 2025-05-07
+    -   #1 Added support for chatfic format v1.1
+
+## 0.2.1 - 2024-09-11
     -   #1 Added support for character properties (eye color, hair style etc)
     -   #2 Alien character field is not an error anymore. Causes a warning.
     -   #3 Fixed missing "Multimedia not used" warnings from Compiled story.

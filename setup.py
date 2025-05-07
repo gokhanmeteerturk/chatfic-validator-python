@@ -5,7 +5,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="chatfic-validator",
-    version="0.2.1",
+    version="0.2.3",
     author="Gökhan Mete Ertürk",
     author_email="8rlvjfxsh@mozmail.com",
     description="A Python package for validating chatfic-format data",
@@ -19,4 +19,6 @@ setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.6",
+    license="MIT",
+    license_files=["LICENSE"]
 )
